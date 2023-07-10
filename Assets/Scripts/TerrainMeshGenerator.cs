@@ -57,7 +57,8 @@ namespace DynamicLOD
                 vertices[i] = chunk.Position - new Vector2(chunk.Size, chunk.Size) * _vertexOrder[i];
                 if (!_vertexIndex.ContainsKey(vertices[i]))
                 {
-                    _vertices.Add(vertices[i]);
+                    Vector3 vPos = new Vector3(vertices[i].x, 0, vertices[i].y);
+                    _vertices.Add(vPos);
                     _vertexIndex[vertices[i]] = _vertices.Count - 1;
                 }
             }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace DynamicLOD
@@ -19,7 +18,7 @@ namespace DynamicLOD
 
         public QuadTree(Vector2 position, float size, int depth)
         {
-            _parent = new QuadTreeNode(position, size);
+            _parent = new QuadTreeNode(position, size * 0.5f);
             _leafs = new HashSet<QuadTreeNode>();
             _parent.Subdivide(depth);
         }
