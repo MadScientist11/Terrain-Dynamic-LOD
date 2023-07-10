@@ -31,8 +31,15 @@ namespace DynamicLOD
             return _leafs;
         }
 
+        public void Insert(Vector2 position)
+        {
+            _parent.Insert(position, 7);
+        }
+
         private void AddLeafsRecursive(QuadTreeNode node)
         {
+            if (node is null) return;
+            
             if (node.IsLeaf)
             {
                 _leafs.Add(node);
@@ -41,6 +48,9 @@ namespace DynamicLOD
 
             foreach (QuadTreeNode child in node.Children)
             {
+                if(child is null) 
+                    continue;
+                
                 if (child.IsLeaf)
                 {
                     _leafs.Add(child);
@@ -56,7 +66,7 @@ namespace DynamicLOD
         {
             int index = 0;
             index |= lookUpPosition.y > position.y ? 2 : 0;
-            index |= lookUpPosition.x > position.y ? 1 : 0;
+            index |= lookUpPosition.x > position.x ? 1 : 0;
             return (QuadTreeSide)index;
         }
 
@@ -83,22 +93,26 @@ namespace DynamicLOD
 
             public void Insert(Vector2 position, int depth)
             {
-                _children ??= new QuadTreeNode[4];
-
                 QuadTreeSide quadTreeSide = GetBoundedSide(_position, position);
-                for (var i = 0; i < _children.Length; i++)
+
+                if (IsLeaf)
+                    this.Subdivide(0);
+                
+                for (byte i = 0; i < _children.Length; i++)
                 {
-                    if ((int)quadTreeSide == i && _children[(int)quadTreeSide] == null && depth > 0)
+                    Vector2 newPosition = _position;
+                    newPosition.y += (IsBottomBitSet(i) ? (-_size) : (_size)) * 0.5f;
+                    newPosition.x += (IsRightBitSet(i) ? (-_size) : (_size)) * 0.5f;
+
+                    if (quadTreeSide == (QuadTreeSide)i && depth > 0)
                     {
-                        _children[(int)quadTreeSide] = new QuadTreeNode(position, _size * 0.5f);
+                        Children[i].Insert(position, depth - 1);
                     }
                 }
             }
 
             public void Subdivide(int depth)
             {
-                if (depth == 0) return;
-
                 _children = new QuadTreeNode[4];
 
                 for (byte i = 0; i < _children.Length; i++)
@@ -109,15 +123,16 @@ namespace DynamicLOD
                     Children[i] = new QuadTreeNode(newPosition, _size * 0.5f);
                 }
 
+                if (depth == 0) return;
+
                 foreach (QuadTreeNode child in Children)
                 {
                     child.Subdivide(depth - 1);
                 }
-
-                bool IsBottomBitSet(byte i) => (i & 2) == 2;
-
-                bool IsRightBitSet(byte i) => (i & 1) == 1;
             }
+
+            private bool IsBottomBitSet(byte i) => (i & 2) == 2;
+            private bool IsRightBitSet(byte i) => (i & 1) == 1;
         }
     }
 }

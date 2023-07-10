@@ -14,6 +14,11 @@ namespace DynamicLOD
             _terrainQuadTree = new QuadTree(Vector2.one, size, initialDepth);
         }
 
+        public void SetTerrainEffector(Vector2 position)
+        {
+            _terrainQuadTree.Insert(position);
+        }
+
         public HashSet<QuadTree.QuadTreeNode> GetTerrainChunks()
         {
             return _terrainQuadTree.GetLeafs();
