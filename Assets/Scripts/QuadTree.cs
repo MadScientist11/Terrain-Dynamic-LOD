@@ -1,13 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DynamicLOD
 {
+    public enum QuadTreeSide : byte
+    {
+        TopLeft = 0,
+        TopRight = 1,
+        BottomLeft = 2,
+        BottomRight = 3,
+    }
+
     public class QuadTree
     {
         private readonly QuadTreeNode _parent;
         private readonly HashSet<QuadTreeNode> _leafs;
-
 
         public QuadTree(Vector2 position, float size, int depth)
         {
@@ -44,6 +52,15 @@ namespace DynamicLOD
             }
         }
 
+        private static QuadTreeSide GetBoundedSide(Vector2 lookUpPosition, Vector2 position)
+        {
+            int index = 0;
+            index |= lookUpPosition.y > position.y ? 2 : 0;
+            index |= lookUpPosition.x > position.y ? 1 : 0;
+            return (QuadTreeSide)index;
+        }
+
+
         public class QuadTreeNode
         {
             public bool IsLeaf => Children == null;
@@ -64,6 +81,19 @@ namespace DynamicLOD
                 _position = position;
             }
 
+            public void Insert(Vector2 position, int depth)
+            {
+                _children ??= new QuadTreeNode[4];
+
+                QuadTreeSide quadTreeSide = GetBoundedSide(_position, position);
+                for (var i = 0; i < _children.Length; i++)
+                {
+                    if ((int)quadTreeSide == i && _children[(int)quadTreeSide] == null && depth > 0)
+                    {
+                        _children[(int)quadTreeSide] = new QuadTreeNode(position, _size * 0.5f);
+                    }
+                }
+            }
 
             public void Subdivide(int depth)
             {
@@ -71,16 +101,22 @@ namespace DynamicLOD
 
                 _children = new QuadTreeNode[4];
 
-                Children[0] = new QuadTreeNode(_position - new Vector2(_size, _size) * 0.5f, _size * 0.5f);
-                Children[1] = new QuadTreeNode(_position - new Vector2(-_size, _size) * 0.5f, _size * 0.5f);
-                Children[2] = new QuadTreeNode(_position - new Vector2(_size, -_size) * 0.5f, _size * 0.5f);
-                Children[3] = new QuadTreeNode(_position - new Vector2(-_size, -_size) * 0.5f, _size * 0.5f);
-
+                for (byte i = 0; i < _children.Length; i++)
+                {
+                    Vector2 newPosition = _position;
+                    newPosition.y += (IsBottomBitSet(i) ? (-_size) : (_size)) * 0.5f;
+                    newPosition.x += (IsRightBitSet(i) ? (-_size) : (_size)) * 0.5f;
+                    Children[i] = new QuadTreeNode(newPosition, _size * 0.5f);
+                }
 
                 foreach (QuadTreeNode child in Children)
                 {
                     child.Subdivide(depth - 1);
                 }
+
+                bool IsBottomBitSet(byte i) => (i & 2) == 2;
+
+                bool IsRightBitSet(byte i) => (i & 1) == 1;
             }
         }
     }
