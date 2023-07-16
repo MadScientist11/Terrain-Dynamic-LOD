@@ -99,10 +99,6 @@ namespace DynamicLOD
                 
                 for (byte i = 0; i < _children.Length; i++)
                 {
-                    Vector2 newPosition = _position;
-                    newPosition.y += (IsBottomBitSet(i) ? (-_size) : (_size)) * 0.5f;
-                    newPosition.x += (IsRightBitSet(i) ? (-_size) : (_size)) * 0.5f;
-
                     if (quadTreeSide == (QuadTreeSide)i && depth > 0)
                     {
                         Children[i].Insert(position, depth - 1);

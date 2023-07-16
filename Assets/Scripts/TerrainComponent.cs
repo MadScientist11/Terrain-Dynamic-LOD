@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace DynamicLOD
@@ -13,10 +14,16 @@ namespace DynamicLOD
 
         private void Start()
         {
+            
+        }
+
+        private void Update()
+        {
             Terrain terrain = new Terrain(transform.position,_size, _lodLevel);
-            terrain.SetTerrainEffector(_effector.position);
+            terrain.SetTerrainEffector(new Vector2(_effector.position.x, _effector.position.z));
             TerrainMeshGenerator meshGenerator = new TerrainMeshGenerator(terrain);
             _meshFilter.mesh = meshGenerator.BuildMesh();
+
         }
     }
 }
