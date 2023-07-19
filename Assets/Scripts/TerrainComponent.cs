@@ -8,7 +8,7 @@ namespace DynamicLOD
     {
         [SerializeField] private MeshFilter _meshFilter;
         [SerializeField] private MeshRenderer _meshRenderer;
-        [SerializeField] private Transform _effector;
+        [SerializeField] private Transform[] _effectors;
         [SerializeField] private MeshWireframeComputor _wireframeComputor;
         [SerializeField] private int _lodLevel;
         [SerializeField] private int _size;
@@ -21,7 +21,12 @@ namespace DynamicLOD
         private void Update()
         {
             Terrain terrain = new Terrain(transform.position,_size, _lodLevel);
-            terrain.SetTerrainEffector(new Vector2(_effector.position.x, _effector.position.z));
+            
+            foreach (Transform effector in _effectors)
+            {
+                terrain.SetTerrainEffector(new Vector2(effector.position.x, effector.position.z));
+            }
+           
             TerrainMeshGenerator meshGenerator = new TerrainMeshGenerator(terrain);
             _meshFilter.mesh = meshGenerator.BuildMesh();
             _wireframeComputor.UpdateMesh();
