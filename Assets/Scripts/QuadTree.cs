@@ -30,9 +30,9 @@ namespace DynamicLOD
             return _leafs;
         }
 
-        public void Insert(Vector2 position)
+        public void Insert(Vector2 position, int insertDepth = 7)
         {
-            _parent.Insert(position, 7);
+            _parent.Insert(position, insertDepth);
         }
 
         private void AddLeafsRecursive(QuadTreeNode node)

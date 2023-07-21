@@ -54,7 +54,7 @@ Material:
     - _Keep_Mesh: 1
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Thickness: 1.35
+    - _Thickness: 3
     m_Colors:
     - _Base_Color: {r: 0, g: 0, b: 0, a: 0}
     - _Wireframe_Color: {r: 0, g: 0.5850754, b: 1, a: 0}
